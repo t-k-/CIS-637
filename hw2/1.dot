@@ -1,0 +1,49 @@
+graph {
+    label="\n\n Problem 1"
+ 
+	{ node[shape="record"]
+	employee
+	[label=<{employee|<u>ID</u><br/>name}>]
+	sales_office 
+	[label=<{sales_office|<u>office_number</u><br/>location}>]
+	property 
+	[label=<{property|<u>ID</u><br/>address<br/>city<br/>state<br/>zip_code}>]
+	owner 
+	[label=<{owner|<u>ID</u><br/>name}>, pos="10,10"]
+	}
+    { node[shape="diamond"]
+	assign
+	manage
+	list
+	own
+	}
+    { node[shape="box"]
+	percentage
+	}
+ 
+	{ edge[dir=none]
+	property -- list
+	}
+	{ edge[dir=forward]
+	employee -- assign
+	manage -- employee
+	list -- sales_office
+	}
+	{ edge[dir=forward, color="black:white:black"]
+	assign -- sales_office
+	}
+	{ edge[color="black:white:black"]
+	sales_office -- manage
+	owner -- own
+	property -- own
+	}
+	{ edge[style="dashed"]
+	percentage -- own
+	}
+	{ edge[]
+	}
+	{ edge[style=invis]
+	owner -- manage
+	percentage -- manage
+	}
+}

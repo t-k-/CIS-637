@@ -1,0 +1,176 @@
+17号的第10题:
+How many distinct students are taking courses taught by instructors in Computer Sci. in the Spring of 2009.
+
+首先，取alias的时候小心和keyword （这里是in）重名，一种方法就是在alia外包上 left quote，另外 select 显示的column 名字不会告诉你是属于哪个table的，必要的时候也可以用 alias指定名字（这里是instructor.ID）
+select `in`.ID as 'instructor.ID'  from instructor `in` join teaches te on (`in`.ID = te.ID);
+
+另外，join的时候，
+select * from instructor i join teaches using (ID) join takes using (course_id)
+上面这个表的结果已经出现两个叫ID的column了，这个时候再join ID 的时候就有必要指名 table name 了：
+select * from instructor i join teaches using (ID) join takes using (course_id) join student on takes.ID = student.ID;
+
+这题的答案： select distinct(student.name) from instructor join teaches using (ID) join takes using (course_id) join student on takes.ID = student.ID where instructor.dept_name='Comp. Sci.' and teaches.semester='Spring' and teaches.year='2009';
+============================
+第一题不能使用：
+select * from takes natural join course natural join student;
+当时课上老师也不知道，因为他没有发现 course.dept_name 和 student.dept_name 是老鼠屎。
+要查询的 Levy 其实是个豆逼，它的 dept_name = Physics，但是选的课都是 Comp. Sci. 的，所以最后他的 (ID, dept_name='Physics') 不可能和 takes Join course 的 (ID, dept_name='Comp. Sci')一样。故natural join结果为空。
+
+这题的答案：select c.course_id, t.grade, c.credits from student s join takes t using (ID) join course c on t.course_id = c.course_id where s.name = 'Levy';
+
+=============================
+Outer Join (例子中有一个叫SNOW的学生没有选课)
+select * from takes left outer join student on student.ID = takes.ID; 没有NULL
+select * from student left outer join takes on student.ID = takes.ID;  右表有NULL
+select * from student right outer join takes on student.ID = takes.ID; 没有NULL
+select * from takes right outer join student on student.ID = takes.ID; 左表有NULL
+
+You don't have FULL JOINS on MySQL, but you can sure emulate them:
+select * from student left outer join takes on student.ID = takes.ID UNION select * from student right outer join takes on student.ID = takes.ID;
+
+==============================
+where放在不同地方的不同效果 (仔细体会哦，其实前者where执行在最后)：
+
+mysql> select department.dept_name, course.dept_name from course join section on course.course_id = section.course_id right outer join department on course.dept_name=department.dept_name where semester='Fall' and year=2009;
++------------+------------+
+| dept_name  | dept_name  |
++------------+------------+
+| Comp. Sci. | Comp. Sci. |
+| Comp. Sci. | Comp. Sci. |
+| Physics    | Physics    |
++------------+------------+
+3 rows in set (0.00 sec)
+
+mysql> select d.dept_name, X.dept_name from department d left outer join (select dept_name from course join section using (course_id) where semester='Fall' and year=2009) as X on d.dept_name = X.dept_name;
++------------+------------+
+| dept_name  | dept_name  |
++------------+------------+
+| Biology    | NULL       |
+| Comp. Sci. | Comp. Sci. |
+| Comp. Sci. | Comp. Sci. |
+| Elec. Eng. | NULL       |
+| Finance    | NULL       |
+| History    | NULL       |
+| Music      | NULL       |
+| Physics    | Physics    |
++------------+------------+
+8 rows in set (0.00 sec)
+
+==================================
+Group by 语句
+
+mysql> select name, ID, count(course_id) from instructor join teaches using (ID) where dept_name = 'Comp. Sci.' group by name;
++------------+-------+------------------+
+| name       | ID    | count(course_id) |
++------------+-------+------------------+
+| Brandt     | 83821 |                3 |
+| Katz       | 45565 |                2 |
+| Srinivasan | 10101 |                3 |
++------------+-------+------------------+
+3 rows in set (0.00 sec)
+
+having 是怎么发明的 (由于执行顺序的原因，teaches在where执行的时候是unknown的)：
+(所以说having is a "where" for the "group")
+mysql> select name, ID, count(course_id) as teaches from instructor join teaches using (ID) where dept_name = 'Comp. Sci.' and teaches = 3 group by name;
+ERROR 1054 (42S22): Unknown column 'teaches' in 'where clause'
+
+Group by 搭配 having
+mysql> select name, ID, count(course_id) as teaches from instructor join teaches using (ID) where dept_name = 'Comp. Sci.' group by name having 
+teaches = 3;                                                                                                                                    
++------------+-------+---------+
+| name       | ID    | teaches |
++------------+-------+---------+
+| Brandt     | 83821 |       3 |
+| Srinivasan | 10101 |       3 |
++------------+-------+---------+
+2 rows in set (0.00 sec)
+
+=====================================
+Order By 语句
+
+select ID, name, sum(credits) as sum_credits from student join takes t using (ID) join course c on t.course_id = c.course_id group by name order by sum_credits DESC;
+
+=====================================
+统计上某些课的人数：
+mysql> select * from section s join takes t using(course_id) where s.semester='Fall' and s.year=2009;          
++-----------+--------+----------+------+----------+-------------+--------------+-------+--------+----------+------+-------+
+| course_id | sec_id | semester | year | building | room_number | time_slot_id | ID    | sec_id | semester | year | grade |
++-----------+--------+----------+------+----------+-------------+--------------+-------+--------+----------+------+-------+
+| CS-101    | 1      | Fall     | 2009 | Packard  | 101         | H            | 00128 | 1      | Fall     | 2009 | A     |
+| CS-101    | 1      | Fall     | 2009 | Packard  | 101         | H            | 12345 | 1      | Fall     | 2009 | C     |
+| CS-101    | 1      | Fall     | 2009 | Packard  | 101         | H            | 45678 | 1      | Fall     | 2009 | F     |
+| CS-101    | 1      | Fall     | 2009 | Packard  | 101         | H            | 54321 | 1      | Fall     | 2009 | A-    |
+| CS-101    | 1      | Fall     | 2009 | Packard  | 101         | H            | 76543 | 1      | Fall     | 2009 | A     |
+| CS-101    | 1      | Fall     | 2009 | Packard  | 101         | H            | 98765 | 1      | Fall     | 2009 | C-    |
+| CS-101    | 1      | Fall     | 2009 | Packard  | 101         | H            | 45678 | 1      | Spring   | 2010 | B+    |
+| CS-347    | 1      | Fall     | 2009 | Taylor   | 3128        | A            | 00128 | 1      | Fall     | 2009 | A-    |
+| CS-347    | 1      | Fall     | 2009 | Taylor   | 3128        | A            | 12345 | 1      | Fall     | 2009 | A     |
+| PHY-101   | 1      | Fall     | 2009 | Watson   | 100         | A            | 44553 | 1      | Fall     | 2009 | B-    |
++-----------+--------+----------+------+----------+-------------+--------------+-------+--------+----------+------+-------+
+10 rows in set (0.00 sec)
+
+mysql> select s.*, count(distinct t.ID) from section s join takes t using(course_id) where s.semester='Fall' and s.year=2009 group by s.course_id;
++-----------+--------+----------+------+----------+-------------+--------------+----------------------+
+| course_id | sec_id | semester | year | building | room_number | time_slot_id | count(distinct t.ID) |
++-----------+--------+----------+------+----------+-------------+--------------+----------------------+
+| CS-101    | 1      | Fall     | 2009 | Packard  | 101         | H            |                    6 |
+| CS-347    | 1      | Fall     | 2009 | Taylor   | 3128        | A            |                    2 |
+| PHY-101   | 1      | Fall     | 2009 | Watson   | 100         | A            |                    1 |
++-----------+--------+----------+------+----------+-------------+--------------+----------------------+
+3 rows in set (0.00 sec)
+=======================================
+group by 的一般句式是：
+select XXX, foo(YYY), fun(ZZZ) from .... group by XXX;
+老师说group by 什么，一般什么就会出现在列表选择里。
+
+但有些时候选择的column 既非group by的内容，也不运行函数：
+select WWW, XXX, foo(YYY), fun(ZZZ) from .... group by XXX;
+这时候要格外小心，说不定WWW在group by运行前有好几个，而最终结果只列出第一个。这大多时候不是我们期望的结果。
+=======================================
+group by 后面可以跟多个fields：
+group by a, b
+=======================================
+第 2 题我的答案是：
+mysql> select s.name, t.course_id, t.grade from student s join takes t using (id) join teaches te on t.course_id=te.course_id join instructor ins on te.id=ins.id where t.course_id='CS-101' and ins.name='Srinivasan'; 
++----------+-----------+-------+
+| name     | course_id | grade |
++----------+-----------+-------+
+| Zhang    | CS-101    | A     |
+| Shankar  | CS-101    | C     |
+| Levy     | CS-101    | F     |
+| Levy     | CS-101    | B+    |
+| Williams | CS-101    | A-    |
+| Brown    | CS-101    | A     |
+| Bourikas | CS-101    | C-    |
++----------+-----------+-------+
+7 rows in set (0.00 sec)
+
+第 3 题我的答案是：
+mysql> select * from department left outer join course using (dept_name) where title=NULL;
+Empty set (0.00 sec)
+
+第 4 题我的答案是：
+mysql> select * from instructor left outer join teaches using (id) where teaches.ID is NULL;
++-------+-----------+-----------+----------+-----------+--------+----------+------+
+| ID    | name      | dept_name | salary   | course_id | sec_id | semester | year |
++-------+-----------+-----------+----------+-----------+--------+----------+------+
+| 33456 | Gold      | Physics   | 87000.00 | NULL      | NULL   | NULL     | NULL |
+| 58583 | Califieri | History   | 62000.00 | NULL      | NULL   | NULL     | NULL |
+| 76543 | Singh     | Finance   | 80000.00 | NULL      | NULL   | NULL     | NULL |
++-------+-----------+-----------+----------+-----------+--------+----------+------+
+3 rows in set (0.00 sec)
+
+第 7 题我的答案是：
+mysql> select department.dept_name, avg(credits) as avg_credits from department join course using (dept_name) group by dept_name;
++------------+-------------+
+| dept_name  | avg_credits |
++------------+-------------+
+| Biology    |      3.6667 |
+| Comp. Sci. |      3.4000 |
+| Elec. Eng. |      3.0000 |
+| Finance    |      3.0000 |
+| History    |      3.0000 |
+| Music      |      3.0000 |
+| Physics    |      4.0000 |
++------------+-------------+
+7 rows in set (0.00 sec)

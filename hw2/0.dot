@@ -1,0 +1,26 @@
+graph {
+    label="\n\n Problem 1"
+ 
+	{ node[shape="record"]
+	a [label="{apple| a \lb \lc \l}"]
+	b [label="{boy| a \lb \lc \l}"]
+	c [label="{commons| a \lb \lc \l}"]
+	}
+    { node[shape="diamond", peripheries=2]
+	d
+	}
+    { node[shape="box"]
+	x
+	}
+ 
+	{ edge[dir=forward]
+	d -- b
+	a -- b 
+	}
+	{ edge[color="black:white:black"]
+	c -- d 
+	}
+	{ edge[style="dashed"]
+	x -- d
+	}
+}

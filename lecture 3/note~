@@ -1,0 +1,3 @@
+可以在定义field的时候顺便加主键： create table abc (ID int primary key)
+
+删除不掉主键，但是又找不到任何其他table 的外键 引用了这个table 的主键。解决方法： 删除这个table的外键（即使这个外键不引用这个主键）
