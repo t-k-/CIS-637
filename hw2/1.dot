@@ -23,9 +23,9 @@ graph {
  
 	{ edge[dir=none]
 	property -- list
+	employee -- assign
 	}
 	{ edge[dir=forward]
-	employee -- assign
 	manage -- employee
 	list -- sales_office
 	}

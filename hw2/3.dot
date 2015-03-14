@@ -1,0 +1,99 @@
+graph {
+    label="\n\n Problem 3"
+ 
+	{ node[shape="record"]
+	raw_material 
+	[label=<{raw_material|<u>ID</u><br/>unit_of_measure<br/>name<br/>cost<br/>}>]
+	vendor 
+	[label=<{vendor|<u>ID</u><br/>name<br/>address<br/>}>]
+	sales_territory  
+	[label=<{sales_territory|<u>ID</u><br/>name<br/>}>]
+	sales_people 
+	[label=<{sales_people|Tel<br/>Fax<br/>}>]
+	product 
+	[label=<{product|<u>ID</u><br/>description<br/>finish<br/>price<br/>}>]
+	customer  
+	[label=<{customer|<u>ID</u><br/>name<br/>address<br/>zip_code<br/>}>]
+	product_line  
+	[label=<{product_line|<u>ID</u><br/>name<br/>}>]
+	order  
+	[label=<{order|<u>ID</u><br/>data<br/>quantity<br/>}>]
+	work_center  
+	[label=<{work_center|<u>ID</u><br/>location<br/>}>]
+	employee  
+	[label=<{employee|<u>ID</u><br/>name<br/>address<br/>}>]
+	manager  
+	[label=<{manager|}>]
+	supervisor  
+	[label=<{supervisor|}>]
+	skill  
+	[label=<{skill|<u>name</u>}>]
+	}
+    { node[shape="diamond"]
+	supply
+	serve
+	business
+	assemble
+	produce
+	group
+	request
+	submit
+	work_at
+	have	
+	supervise
+	}
+    { node[shape="diamond", peripheries=2]
+	is_0 [label="is"]
+	is_1 [label="is"]
+	is_2 [label="is"]
+	}
+    { node[shape="box"]
+	unit_price
+	quantity
+	}
+ 
+	{ edge[dir=none]
+	supply -- vendor
+	business -- customer
+	produce -- work_center
+	have -- skill
+	}
+	{ edge[dir=forward]
+	request -- product
+	is_0 -- employee
+	is_1 -- employee
+	is_2 -- employee
+	supervise -- supervisor
+	submit -- customer 
+	}
+	{ edge[dir=forward, color="black:white:black"]
+	serve -- sales_territory
+	group -- product_line
+	}
+	{ edge[color="black:white:black"]
+	supply -- raw_material
+	raw_material -- assemble
+	assemble -- product
+	sales_people -- serve
+	sales_territory -- business
+	product -- produce
+	product -- group 
+	order -- request
+	order -- submit
+	work_center -- work_at
+	work_at -- employee
+	manager -- is_0
+	supervisor -- is_1
+	sales_people -- is_2
+	employee -- have
+	employee -- supervise
+	}
+	{ edge[style="dashed"]
+	unit_price -- supply
+	assemble -- quantity
+	}
+	{ edge[]
+	}
+	{ edge[style=invis]
+	}
+}
