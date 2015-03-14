@@ -1,6 +1,6 @@
 .PHONY: clean
 
-all: 0.png 1.png
+all: 0.png 1.png 2.png
 	
 %.png: %.dot clean
 	dot -Tpng $*.dot -o $@

@@ -1,0 +1,61 @@
+graph {
+    label="\n\n Problem 2"
+ 
+	{ node[shape="record"]
+	employee
+	[label=<{employee|<u>unique_num</u><br/>name<br/>birth_date<br/>job_title}>]
+	department 
+	[label=<{department|<u>name</u><br/>phone_num}>]
+	vendor 
+	[label=<{vendor|<u>name</u><br/>address<br/>}>]
+	project 
+	[label=<{project|<u>project_num</u><br/>estimated_cost}>]
+	city 
+	[label=<{city|<u>name</u><br/>state<br/>population<br/>}>]
+	skill 
+	[label=<{skill|<u>number</u><br/>description<br/>}>]
+	}
+    { node[shape="diamond"]
+	marry
+	work
+	have
+	use
+	report
+	deal
+	}
+    { node[shape="box"]
+	last_meet_date	
+	date
+	}
+ 
+	{ edge[dir=none]
+	employee -- work
+	city -- work
+	employee -- use 
+	skill -- use 
+	employee -- have
+	have -- skill
+	employee -- report
+	department -- deal 
+	deal -- vendor
+	}
+	{ edge[dir=forward]
+	marry -- employee
+	marry -- employee
+	work -- project
+	report -- department
+	}
+	{ edge[dir=forward, color="black:white:black"]
+	use -- project
+	}
+	{ edge[color="black:white:black"]
+	}
+	{ edge[style="dashed"]
+	marry -- date
+	deal -- last_meet_date 
+	}
+	{ edge[]
+	}
+	{ edge[style=invis]
+	}
+}
