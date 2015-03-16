@@ -1,5 +1,3 @@
-	tag:工作篇
-[code lan="sql"]
 CREATE TABLE `employee` (
   `ID` int(11),
   `name` varchar(30),
@@ -27,10 +25,10 @@ CREATE TABLE `sales_office` (
   `city` varchar(30) NOT NULL,
   `state` varchar(30) NOT NULL,
   PRIMARY KEY (`office_num`),
+  UNIQUE (manager_ID),
   UNIQUE (address, city, state),
   FOREIGN KEY (`manager_ID`) REFERENCES `employee` (`ID`),
-  FOREIGN KEY (`address`, `city`, `state`) 
-  REFERENCES `location` (`address`, `city`, `state`)
+  FOREIGN KEY (`address`, `city`, `state`) REFERENCES `location` (`address`, `city`, `state`)
 ) ENGINE=InnoDB; 
 
 CREATE TABLE `property` (
@@ -40,8 +38,7 @@ CREATE TABLE `property` (
   `state` varchar(30) NOT NULL,
   PRIMARY KEY (`ID`),
   UNIQUE (address, city, state),
-  FOREIGN KEY (`address`, `city`, `state`) 
-  REFERENCES `location` (`address`, `city`, `state`)
+  FOREIGN KEY (`address`, `city`, `state`) REFERENCES `location` (`address`, `city`, `state`)
 ) ENGINE=InnoDB;
 
 CREATE TABLE `own` (
@@ -68,4 +65,3 @@ CREATE TABLE `list` (
   FOREIGN KEY (`p_ID`) REFERENCES `property` (`ID`),
   FOREIGN KEY (`office_num`) REFERENCES `sales_office` (`office_num`)
 ) ENGINE=InnoDB;
-[/code]

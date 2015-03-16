@@ -43,9 +43,9 @@ graph {
 	supervise
 	}
     { node[shape="diamond", peripheries=2]
-	is_0 [label="is"]
-	is_1 [label="is"]
-	is_2 [label="is"]
+	is_0 [label="manager_who"]
+	is_1 [label="supervisor_who"]
+	is_2 [label="sales_people_who"]
 	}
     { node[shape="box"]
 	unit_price

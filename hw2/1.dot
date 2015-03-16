@@ -5,9 +5,11 @@ graph {
 	employee
 	[label=<{employee|<u>ID</u><br/>name}>]
 	sales_office 
-	[label=<{sales_office|<u>office_number</u><br/>location}>]
+	[label=<{sales_office|<u>office_num</u>}>]
 	property 
-	[label=<{property|<u>ID</u><br/>address<br/>city<br/>state<br/>zip_code}>]
+	[label=<{property|<u>ID</u>}>]
+	location 
+	[label=<{location|<u>address</u><br/><u>city</u><br/><u>state</u><br/>zip_code}>]
 	owner 
 	[label=<{owner|<u>ID</u><br/>name}>, pos="10,10"]
 	}
@@ -16,6 +18,8 @@ graph {
 	manage
 	list
 	own
+	office_location
+	property_location
 	}
     { node[shape="box"]
 	percentage
@@ -28,12 +32,16 @@ graph {
 	{ edge[dir=forward]
 	manage -- employee
 	list -- sales_office
+	office_location -- location 
+	property_location -- location 
 	}
 	{ edge[dir=forward, color="black:white:black"]
 	assign -- sales_office
+	office_location -- sales_office
+	property_location -- property 
+	manage -- sales_office
 	}
 	{ edge[color="black:white:black"]
-	sales_office -- manage
 	owner -- own
 	property -- own
 	}
@@ -43,7 +51,5 @@ graph {
 	{ edge[]
 	}
 	{ edge[style=invis]
-	owner -- manage
-	percentage -- manage
 	}
 }
