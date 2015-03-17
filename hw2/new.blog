@@ -1,6 +1,6 @@
 	tag:工作篇
 <h2 style="text-align: center">Homework 2</h2>
-<h3>E-R diagrams</h3>
+<h3>E-R diagrams (as references here)</h3>
 
 <img src="twbook/images/1.svg"/>
 
@@ -89,9 +89,9 @@ owner([underline]ID[/underline], name)
 sales_office([underline]office_num[/underline], foreign key manager_ID references to employee(ID) UNIQUE NOT NULL, foreign key (address, city, state) references to location(address, city, state) UNIQUE NOT NULL)
 property([underline]ID[/underline], foreign key (address, city, state) references to location(address, city, state) UNIQUE NOT NULL)
 location([underline]address[/underline], [underline]city[/underline], [underline]state[/underline], zip_code)
-assign([underline]e_ID[/underline], office_num)
-own([underline]o_ID[/underline], [underline]p_ID[/underline], percentage)
-list([underline]p_ID[/underline], office_num)
+assign([underline]e_ID[/underline] references to employee(ID), foreign key (office_num) references to sales_office(office_num))
+own([underline]o_ID[/underline] references to owner(ID), [underline]p_ID[/underline], percentage)
+list([underline]p_ID[/underline] references to property(ID), foreign key (office_num) references to sales_office(office_num))
 
 <b>Cardinality and Participation Constraints</b>
 For the tree constraints below:
@@ -100,17 +100,17 @@ For the tree constraints below:
 <li>Each owner has at least one property.</li>
 <li>Each property has at least one owner.</li>
 </ol>
-We cannot ensure their total participation because the only way to ensure this (at least as much as we have learnt) is to define a foreign key in its relation references to another, with NOT NULL constrain. To do this, they should eventually be merged together, however, because they either have a many-to-many or one-to-many relationship, none of them can be merged.
+We cannot ensure their total participations because the only way to ensure this (at least as much as we have learnt in SQL) is to define a NOT NULL foreign key with references to another. To do this, they should eventually be merged together, however, because they either have a many-to-many or one-to-many relationship, none of them can be merged.
 
-As for the constraint the co-owners has their percentages sum to be 100, we cannot ensure this cardinality constraints either. Because the percentage of ownership unit is associated with particular "own" relationship, which
+As for the constraint that the co-owners has their percentages sum to be 100, we cannot ensure this cardinality constraints either. Because the percentage of ownership unit is associated with particular "own" relationship, and there may be many instances of "own" table with different percentage values, so there is no simple way to enforce their percentages sum to be 100.
 
 For the following tree constraints:
 <ol>
-Given one sales_office, there is exact one employee being manager. 
-An employee can only be assign to one sales_office.
-Each property be listed with only one sales_office.
+<li>Given one sales_office, there is exact one employee being manager. </li>
+<li>An employee can only be assign to one sales_office.</li>
+<li>Each property be listed with only one sales_office.</li>
 </ol>
-
+We can enforce these constrains by defining manager_ID as primary key in "manage", employee ID as primary key in "assign" and property ID as primary in "list" relations. So that primary key constrain will ensure there is no two lines with duplicated primary key values for each relation.
 
 <b>SQL statements to implement the relational schema:</b>
 [code lan="sql" ln="false"]
@@ -185,7 +185,45 @@ CREATE TABLE `list` (
 ) ENGINE=InnoDB;
 [/code]
 
+<h3>Problem 5</h3>
+(a).
+<ol>
+<li>employee: employee.ID -> employee.name</li>
+<li>owner: owner.ID ->owner.name</li>
+<li>location: address, city, state -> zip_code</li>
+<li>assign: employee.ID -> office_num</li>
+<li>office_location: office_num -> address</li>
+<li>office_location: office_num -> city </li>
+<li>office_location: office_num -> state </li>
+<li>office_location: office_num -> zip_code </li>
+</ol>
+
+(b).
+<ol>
+<li>employee: employee_num - > employee.name</li>
+<li>employee: employee_num - > birth_date </li>
+<li>employee: employee_num - > job_title </li>
+<li>project: project_num -> estimated_cost</li>
+<li>skill: skill_num -> description</li>
+<li>department: department.name -> phone_num</li>
+<li>assign_at: employee_num, city.name -> project_num </li>
+<li>assign_at: employee_num, project_num -> city.name </li>
+</ol>
+
+(c).
+<ol>
+<li>submit: order.ID -> customer.ID</li>
+<li>submit: order.ID -> customer.name</li>
+<li>submit: order.ID -> customer.address</li>
+<li>submit: order.ID -> customer.zip_code</li>
+<li>group: product.ID -> product_line.ID</li>
+<li>group: product.ID -> product_line.name</li>
+<li>serve: sales_people.ID -> sales_territory.ID</li>
+<li>serve: sales_people.ID -> sales_territory.name</li>
+</ol>
+
 <h3>Problem 6</h3>
+<b>part 1</b>
 <ul>
 <li> List all the course titles from math department with greater than or equal to 3 credits:
 [code lan="sql" ln="false"]
@@ -215,6 +253,7 @@ select dept_name, avg(capacity) as average_capacity from
 </ul>
 
 [imath]\newcommand{r}[1]{\mathrm{#1}}[/imath]
+<b>part 2</b>
 <ul>
 <li>
 [code lan="sql" ln="false"]
