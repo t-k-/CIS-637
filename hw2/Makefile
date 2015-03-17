@@ -1,9 +1,9 @@
 .PHONY: clean
 
-all: 0.png 1.png 2.png 3.png
+all: $(addsuffix .svg, 0 1 2 3)
 	
-%.png: %.dot clean
-	dot -Tpng $*.dot -o $@
+%.svg: %.dot clean
+	dot -Tsvg $*.dot -o $@
 
 clean:
-	rm -f *.png	
+	rm -f *.svg
