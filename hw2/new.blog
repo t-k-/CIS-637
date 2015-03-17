@@ -1,32 +1,149 @@
 	tag:工作篇
-[code lan="sql"]
+<h2 style="text-align: center">Homework 2</h2>
+<h3>E-R diagrams</h3>
+<img src="twbook/images/1.png"/>
+
+
+
+
+
+<img src="twbook/images/2.png"/>
+
+
+
+
+
+<img src="twbook/images/3.png"/>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h3>Problem 4</h3>
+1. Define relations for each entity set:
+
+employee([underline]ID[/underline], name)
+owner([underline]ID[/underline], name)
+sales_office([underline]office_num[/underline])
+property([underline]ID[/underline])
+location([underline]address[/underline], [underline]city[/underline], [underline]state[/underline], zip_code)
+
+2. Define relations for each relationship set (all pointers are defined as foreign key):
+
+manage([underline]e_ID[/underline], [underline]office_num[/underline])
+assign([underline]e_ID[/underline], [underline]office_num[/underline])
+own([underline]o_ID[/underline], [underline]p_ID[/underline], percentage)
+list([underline]p_ID[/underline], [underline]office_num[/underline])
+property_location([underline]p_ID[/underline], [underline]address, city, state[/underline])
+office_location([underline]office_num[/underline], [underline]address, city, state[/underline])
+
+3. Modify keys to capture mapping constraints:
+
+modified: manage(e_ID UNIQUE, [underline]office_num[/underline])
+modified: assign([underline]e_ID[/underline], office_num)
+no change: own([underline]o_ID[/underline], [underline]p_ID[/underline], percentage)
+modified: list([underline]p_ID[/underline], office_num)
+modified: property_location([underline]p_ID[/underline], (address, city, state) UNIQUE)
+modified: office_location([underline]office_num[/underline], (address, city, state) UNIQUE)
+
+4. Eliminate Redundancy:
+(Nothing can be done in this step)
+
+5. Merge relations to capture participation constrains:
+(1). Relations with same primary key:
+employee & assign
+sales_office & manage 
+property & list
+sales_office & office_location
+property & property_location 
+
+(2). Merge relations with total participation and define foreign key not NULL:
+merge: sales_office & manage & office_location
+=> sales_office([underline]office_num[/underline], foreign key manager_ID references to employee(ID) UNIQUE NOT NULL, foreign key (address, city, state) references to location(address, city, state) UNIQUE NOT NULL)
+
+merge: property & property_location 
+=> property([underline]ID[/underline], foreign key (address, city, state) references to location(address, city, state) UNIQUE NOT NULL)
+
+<b>final results:</b>
+employee([underline]ID[/underline], name)
+owner([underline]ID[/underline], name)
+sales_office([underline]office_num[/underline], foreign key manager_ID references to employee(ID) UNIQUE NOT NULL, foreign key (address, city, state) references to location(address, city, state) UNIQUE NOT NULL)
+property([underline]ID[/underline], foreign key (address, city, state) references to location(address, city, state) UNIQUE NOT NULL)
+location([underline]address[/underline], [underline]city[/underline], [underline]state[/underline], zip_code)
+assign([underline]e_ID[/underline], office_num)
+own([underline]o_ID[/underline], [underline]p_ID[/underline], percentage)
+list([underline]p_ID[/underline], office_num)
+
+<b>Cardinality and Participation Constraints</b>
+For the tree constraints below:
+<ol>
+<li>Each sale office must be assign greater than 1 employee(s).</li>
+<li>Each owner has at least one property.</li>
+<li>Each property has at least one owner.</li>
+</ol>
+We cannot ensure their total participation because the only way to ensure this (at least as much as we have learnt) is to define a foreign key in its relation references to another, with NOT NULL constrain. To do this, they should eventually be merged together, however, because they either have a many-to-many or one-to-many relationship, none of them can be merged.
+
+As for the constraint the co-owners has their percentages sum to be 100, we cannot ensure this cardinality constraints either. Because the percentage of ownership unit is associated with particular "own" relationship, which
+
+For the following tree constraints:
+<ol>
+Given one sales_office, there is exact one employee being manager. 
+An employee can only be assign to one sales_office.
+Each property be listed with only one sales_office.
+</ol>
+
+
+<b>SQL statements to implement the relational schema:</b>
+[code lan="sql" ln="false"]
 CREATE TABLE `employee` (
-  `ID` int(11),
+  `ID` int(11) NOT NULL,
   `name` varchar(30),
   PRIMARY KEY (`ID`)
 ) ENGINE=InnoDB;
 
 CREATE TABLE `owner` (
-  `ID` int(11),
+  `ID` int(11) NOT NULL,
   `name` varchar(30),
   PRIMARY KEY (`ID`)
 ) ENGINE=InnoDB;
 
 CREATE TABLE `location` (
-  `address` varchar(120),
-  `city` varchar(30),
-  `state` varchar(30),
+  `address` varchar(120) NOT NULL,
+  `city` varchar(30) NOT NULL,
+  `state` varchar(30) NOT NULL,
   `zip_code` int(11),
   PRIMARY KEY (`address`,`city`,`state`)
 ) ENGINE=InnoDB;
 
 CREATE TABLE `sales_office` (
-  `office_num` int(11),
+  `office_num` int(11) NOT NULL,
   `manager_ID` int(11) NOT NULL,
   `address` varchar(120) NOT NULL,
   `city` varchar(30) NOT NULL,
   `state` varchar(30) NOT NULL,
   PRIMARY KEY (`office_num`),
+  UNIQUE (manager_ID),
   UNIQUE (address, city, state),
   FOREIGN KEY (`manager_ID`) REFERENCES `employee` (`ID`),
   FOREIGN KEY (`address`, `city`, `state`) 
@@ -34,7 +151,7 @@ CREATE TABLE `sales_office` (
 ) ENGINE=InnoDB; 
 
 CREATE TABLE `property` (
-  `ID` int(11),
+  `ID` int(11) NOT NULL,
   `address` varchar(120) NOT NULL,
   `city` varchar(30) NOT NULL,
   `state` varchar(30) NOT NULL,
@@ -69,3 +186,92 @@ CREATE TABLE `list` (
   FOREIGN KEY (`office_num`) REFERENCES `sales_office` (`office_num`)
 ) ENGINE=InnoDB;
 [/code]
+
+<h3>Problem 6</h3>
+<ul>
+<li> List all the course titles from math department with greater than or equal to 3 credits:
+[code lan="sql" ln="false"]
+select title from course where credits >= 3 and dept_name = 'Math';
+[/code]
+</li>
+<li> List the ID and name of students who take CISC437:
+[code lan="sql" ln="false"]
+select ID, name from student natural join takes 
+       where course_id = 'CISC437';
+[/code]
+</li>
+<li> List the ID and name of students who take CISC437:
+[code lan="sql" ln="false"]
+select * from (select ID from takes where course_id = 'CISC437') X 
+         natural join (select ID, name from student) Y;
+[/code]
+</li>
+<li> Calculate the average classroom capacity of all course sections from each department:
+[code lan="sql" ln="false"]
+select dept_name, avg(capacity) as average_capacity from 
+       (select dept_name, capacity from classroom 
+       natural join section natural join course) X 
+       group by dept_name;
+[/code]
+</li>
+</ul>
+
+[imath]\newcommand{r}[1]{\mathrm{#1}}[/imath]
+<ul>
+<li>
+[code lan="sql" ln="false"]
+select title from course join teaches using (course_id) 
+       join instructor using (ID) where name = 'Wu';
+[/code]
+[dmath]\pi_{\r{title}} \sigma_{\r{name=Wu}} (\r{course} \bowtie_{\r{course\_id}} \r{teaches} \bowtie_{\r{ID}} \r{instructor})[/dmath]
+</li>
+<li>  
+[code lan="sql" ln="false"]
+select distinct(s.name) from student s join 
+       takes using (ID) join course c using (course_id) 
+       where c.dept_name = 'Math';
+[/code]
+(Assume the "Math course" means courses from Math department)
+[dmath]\pi_{\r{student.name}} \sigma_{\r{course.dept\_name} = \r{Math}} (\r{student} \bowtie_{\r{ID}} \r{takes} \bowtie_{\r{course\_id}} \r{course})[/dmath]
+</li>
+<li>  
+[code lan="sql" ln="false"]
+select ID, name from instructor i left outer join 
+      (select distinct(ID) from teaches join instructor 
+       using (ID) where year < 2009 or 
+        (year = 2009 and (semester='Summer' or semester='Spring'))
+      ) X using (ID) where X.ID is not NULL;
+[/code]
+[dmath]
+\pi_{\r{ID, name}} \Big( \r{instructor} ⟕_{\r{ID}} 
+	\big(
+	\sigma_{\r{year < 2009\ or\ (year = 2009\ and\ (semester=Summer\ or\ semester=Spring))}}(\r{teaches} \bowtie_{\r{ID}} \r{instructor})
+	\big) 
+\Big)
+[/dmath]
+</li>
+<li>  
+[code lan="sql" ln="false"]
+select dept_name, avg(salary) from instructor group by dept_name;
+[/code]
+[dmath]
+_{\r{dept\_name}}\mathcal{G}_{\r{average(salary)}} \r{instructor}
+[/dmath]
+</li>
+<li>  
+[code lan="sql" ln="false"]
+select capacity - count(ID) as open_seat from takes natural join 
+       section natural join classroom where 
+        course_id = 'CISC637' and semester= 'Spring' and year=2015 
+       group by course_id, semester, year;
+[/code]
+(Assume no two different [key]sec_id[/key]s for CISC637 in Spring 2015)
+[dmath]
+_{\r{course\_id, semester, year}}\mathcal{G}_{\r{capacity - count(ID)}} 
+\big(
+	\sigma_{\r{course\_id=CISC637\ and\ semester=Spring\ and\ year=2015}}
+	(\r{takes} \Join \r{section} \Join \r{classroom})
+\big)
+[/dmath]
+</li>
+</ul>

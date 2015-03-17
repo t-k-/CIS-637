@@ -1,25 +1,25 @@
 CREATE TABLE `employee` (
-  `ID` int(11),
+  `ID` int(11) NOT NULL,
   `name` varchar(30),
   PRIMARY KEY (`ID`)
 ) ENGINE=InnoDB;
 
 CREATE TABLE `owner` (
-  `ID` int(11),
+  `ID` int(11) NOT NULL,
   `name` varchar(30),
   PRIMARY KEY (`ID`)
 ) ENGINE=InnoDB;
 
 CREATE TABLE `location` (
-  `address` varchar(120),
-  `city` varchar(30),
-  `state` varchar(30),
+  `address` varchar(120) NOT NULL,
+  `city` varchar(30) NOT NULL,
+  `state` varchar(30) NOT NULL,
   `zip_code` int(11),
   PRIMARY KEY (`address`,`city`,`state`)
 ) ENGINE=InnoDB;
 
 CREATE TABLE `sales_office` (
-  `office_num` int(11),
+  `office_num` int(11) NOT NULL,
   `manager_ID` int(11) NOT NULL,
   `address` varchar(120) NOT NULL,
   `city` varchar(30) NOT NULL,
@@ -32,7 +32,7 @@ CREATE TABLE `sales_office` (
 ) ENGINE=InnoDB; 
 
 CREATE TABLE `property` (
-  `ID` int(11),
+  `ID` int(11) NOT NULL,
   `address` varchar(120) NOT NULL,
   `city` varchar(30) NOT NULL,
   `state` varchar(30) NOT NULL,

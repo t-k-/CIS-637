@@ -3,7 +3,7 @@ graph {
  
 	{ node[shape="record"]
 	employee
-	[label=<{employee|<u>unique_num</u><br/>name<br/>birth_date<br/>job_title}>]
+	[label=<{employee|<u>employee_num</u><br/>name<br/>birth_date<br/>job_title}>]
 	department 
 	[label=<{department|<u>name</u><br/>phone_num}>]
 	vendor 
@@ -13,46 +13,49 @@ graph {
 	city 
 	[label=<{city|<u>name</u><br/>state<br/>population<br/>}>]
 	skill 
-	[label=<{skill|<u>number</u><br/>description<br/>}>]
+	[label=<{skill|<u>skill_num</u><br/>description<br/>}>]
 	}
     { node[shape="diamond"]
 	marry
 	work
 	have
-	use
+	use_on
 	report
 	deal
+	assign_at
 	}
     { node[shape="box"]
 	last_meet_date	
-	date
+	marry_date
 	}
  
 	{ edge[dir=none]
+	employee -- assign_at
 	employee -- work
-	city -- work
-	employee -- use 
-	skill -- use 
+	work -- project
+	employee -- use_on
 	employee -- have
 	have -- skill
+	skill -- use_on
 	employee -- report
-	department -- deal 
 	deal -- vendor
 	}
 	{ edge[dir=forward]
+	assign_at -- city
+	assign_at -- project 
 	marry -- employee
 	marry -- employee
-	work -- project
 	report -- department
 	}
 	{ edge[dir=forward, color="black:white:black"]
-	use -- project
 	}
 	{ edge[color="black:white:black"]
+	use_on -- project
+	department -- deal 
 	}
 	{ edge[style="dashed"]
-	marry -- date
-	deal -- last_meet_date 
+	marry -- marry_date
+	deal -- last_meet_date
 	}
 	{ edge[]
 	}

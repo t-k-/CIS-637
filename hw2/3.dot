@@ -1,5 +1,5 @@
 graph {
-    label="\n\n Problem 3"
+    label="\n\n Problem 3\n (Assume \"order line\" is a typo, and a given customer order must request at least one product and only one product per product line)"
  
 	{ node[shape="record"]
 	raw_material 
@@ -9,7 +9,7 @@ graph {
 	sales_territory  
 	[label=<{sales_territory|<u>ID</u><br/>name<br/>}>]
 	sales_people 
-	[label=<{sales_people|Tel<br/>Fax<br/>}>]
+	[label=<{sales_people|<u>ID</u><br/>Tel<br/>Fax<br/>}>]
 	product 
 	[label=<{product|<u>ID</u><br/>description<br/>finish<br/>price<br/>}>]
 	customer  
@@ -37,15 +37,16 @@ graph {
 	produce
 	group
 	request
+	request_per_product_line
+	for
 	submit
-	work_at
+	work
 	have	
 	supervise
 	}
     { node[shape="diamond", peripheries=2]
-	is_0 [label="manager_who"]
-	is_1 [label="supervisor_who"]
-	is_2 [label="sales_people_who"]
+	manager_who
+	supervisor_who
 	}
     { node[shape="box"]
 	unit_price
@@ -53,40 +54,45 @@ graph {
 	}
  
 	{ edge[dir=none]
-	supply -- vendor
-	business -- customer
+	order -- for
+	for -- product
+	order -- request
+	request -- customer
+	order -- request_per_product_line
+	customer -- request_per_product_line
+	product_line -- request_per_product_line
+	vendor -- supply
+	work -- employee	
+	skill -- have
 	produce -- work_center
-	have -- skill
+	business -- customer
 	}
 	{ edge[dir=forward]
-	request -- product
-	is_0 -- employee
-	is_1 -- employee
-	is_2 -- employee
+	submit -- customer
+	group -- product_line
 	supervise -- supervisor
-	submit -- customer 
+	supervisor_who -- employee
+	manager_who -- employee
 	}
 	{ edge[dir=forward, color="black:white:black"]
+	request_per_product_line -- product
 	serve -- sales_territory
-	group -- product_line
 	}
 	{ edge[color="black:white:black"]
-	supply -- raw_material
-	raw_material -- assemble
-	assemble -- product
 	sales_people -- serve
 	sales_territory -- business
-	product -- produce
-	product -- group 
-	order -- request
 	order -- submit
-	work_center -- work_at
-	work_at -- employee
-	manager -- is_0
-	supervisor -- is_1
-	sales_people -- is_2
-	employee -- have
+	request -- product
+	product -- group
+	product -- produce
+	work_center -- work
+	supervisor -- supervisor_who
 	employee -- supervise
+	employee -- have
+	manager -- manager_who
+	product -- assemble
+	assemble -- raw_material
+	raw_material -- supply
 	}
 	{ edge[style="dashed"]
 	unit_price -- supply
@@ -95,5 +101,7 @@ graph {
 	{ edge[]
 	}
 	{ edge[style=invis]
+	product_line -- customer
+	supply -- assemble
 	}
 }
