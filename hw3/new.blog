@@ -1,0 +1,283 @@
+	tag:工作篇
+<h3>Problem 1</h3>
+(a) a → b:  <b>No</b>, b can be 2, 3, 4 when a is one.
+(b) a → c:  <b>Yes</b>, for every two a, c has the same value.
+(c) b → a:  <b>Yes</b>, all records have b in different value.
+(d) b → c:  <b>Yes</b>, the same reason. 
+(e) c → a:  <b>No</b>, a can be 1 or 2 for the same value of c.
+(f) c → b:  <b>No</b>, b can be 2, 3, 4, 5 for the same value of c.
+(g) ab → c: <b>Yes</b>. Each combination of ab is different, b can be different too. 
+(h) ac → b: <b>No</b>. For a=1 and c=2, b can be 2, 3 or 4.
+(i) bc → a: <b>Yes</b>. Each combination of bc is different, a can be different too.
+
+<h3>Problem 2</h3>
+<b>ac, bc, dc and ec </b>are the candidate keys. Because each of them has an attribute closure that includes all the fields in R:
+
+For ac:
+[dmath]
+\newcommand{r}{\rightarrow}
+a \r b \r d \\
+d, c \r e
+[/dmath]
+
+For bc:
+[dmath]
+b \r d \\
+d, c \r e \r a
+[/dmath]
+
+For dc:
+[dmath]
+d, c \r e \r a \r b
+[/dmath]
+
+For ec:
+[dmath]
+e \r a \r b \r d
+[/dmath]
+
+And removing any attribute from each key will not get the same complete closure.
+
+<h3>Problem 3</h3>
+(a) <b>af</b> is the candidate key, this can be illustrated by calculating its attribute closure:
+[dmath]
+a \r bcd \\
+ad \r e \\
+f \r gh
+[/dmath]
+We can see [imath]\{af\} \cup \{bcd\} \cup \{e\} \cup \{gh\} = \{abcdefgh\}[/imath]. And removing any attribute from [imath]\{af\}[/imath] will not have a compete closure set.
+
+(b) <b>efg → h</b> can be removed. As we can see from above, FD: efg → h  is not used to calculate the attribute closure of [imath]\{af\}[/imath]. And we can still get the complete set of fields of R.
+
+<h3>Problem 4</h3>
+(a) <b>abe</b> is the candidate key. Its attribute closure:
+[dmath]
+a \r c \\
+b \r d \\
+de \r f
+\newcommand{\set}[1]{\{#1\}}
+[/dmath]
+So [imath]\set{abe} \cup \set{c} \cup \set{d} \cup \set{f} = \set{abcdef}[/imath] and we cannot get the same attribute closure after we remove any attribute from this super key.
+
+(b) We need to add e.g. <b>a → e</b> as the new FD to let <i>a</i> be a candidate key.
+Now we have:
+[dmath]
+a \r bec \\
+b \r d \\
+de \r f
+[/dmath]
+So [imath]\set{a} \cup \set{bec} \cup \set{d} \cup \set{f} = \set{abcdef}[/imath] and we cannot get the same attribute closure after we remove any attribute from this super key.
+
+<h3>Problem 5</h3>
+(a) all nontrivial FDs: 
+<ul>
+<li><b>a → b</b> </li>
+<li><b>c → b</b> </li>
+<li><b>ac → bc</b> </li>
+<li><b>ac → b</b> </li>
+<li><b>ac → c</b> </li>
+</ul>
+
+(b) First identify all the candidate keys, here we have <i>ac</i> as the only candidate key. Therefore, this instance of R is <b>not</b> in BCNF because of both <b>a → b</b> and <b>c → b</b> violate BCNF. (neither <i>a</i> nor <i>c</i> is not super key)
+
+Use FD: a → b that violates BCNF of [imath]R(\underline{a, c}, b)[/imath], we now have:
+[dmath]
+R_0(\underline{a, c}) \\
+R_1(\underline{a}, b)
+[/dmath]
+Which is in BCNF. Therefore we have it as one valid decomposition.
+
+<h3>Problem 6</h3>
+(a) Candidate keys: <b>ba, bc</b> and <b>bde</b>.
+
+(b) For [imath]R(a,b,c,d,e)[/imath], we have two FDs from above that violate BCNF:
+<ul>
+<li><b>cd → e</b></li>
+<li><b>de → a</b></li>
+</ul>
+Because left side of them are not super key.
+
+(c) Use FD: cd → e, we now have:
+[dmath]
+R_0(\underline{a, b}, c, d) \\
+R_1(\underline{c, d}, e)
+[/dmath]
+
+Use FD: bc → d that violates BCNF in [imath]R_0[/imath], we have [imath]R_0[/imath] decomposed:
+[dmath]
+R_2(\underline{a, b}, c) \\
+R_3(\underline{b, c}, d)
+[/dmath]
+
+So <b>one possible decomposition</b> would be:
+[dmath]
+R_1(\underline{c, d}, e) \\
+R_2(\underline{a, b}, c) \\
+R_3(\underline{b, c}, d)
+[/dmath]
+
+On the other hand, use FD: de → a, R is decomposed into:
+[dmath]
+R_0(\underline{b, c}, d, e) \\
+R_1(\underline{d, e}, a)
+[/dmath]
+
+Use FD: dc → e that violates BCNF in [imath]R_0[/imath], decompose [imath]R_0[/imath] into:
+[dmath]
+R_2(\underline{b, c}, d) \\
+R_3(\underline{d, c}, e)
+[/dmath]
+
+Thus <b>another possible decomposition</b> is:
+[dmath]
+R_1(\underline{d, e}, a) \\
+R_2(\underline{b, c}, d) \\
+R_3(\underline{d, c}, e)
+[/dmath]
+
+
+
+
+
+
+
+
+
+<h3>Problem 7</h3>
+(a) The nontrivial FDs that capture the assumptions above:
+<ul>
+<li><b> s_ID, course_id, sec_id, semester, year →  grade</b></li>
+<li><b> course_id, sec_id, semester, year →  i_ID</b></li>
+<li><b> course_id, sec_id, semester, year →  building, room_no</b></li>
+<li><b> course_id, sec_id, semester, year →  time_slot_id</b></li>
+</ul>
+
+(b) All candidate keys: <b>s_ID, course_id, sec_id, semester, year</b> (the only one).
+
+(c) <b>No</b>, one instance of FD that violates BCNF is:
+
+course_id, sec_id, semester, year →  i_ID
+
+Where course_id, sec_id, semester, year is not the super key in <i>takesSecTaughtBy</i>.
+
+Given: course_id, sec_id, semester, year →  i_ID
+
+<i>takesSecTaughtBy</i> can be decomposed into:
+<ul>
+<li> R0(s_ID, course_id, sec_id, semester, year, building, room_no, time_slot_id, grade) </li>
+<li> R1([underline]course_id, sec_id, semester[/underline], i_ID)</li>
+</ul>
+
+Given: course_id, sec_id, semester, year →  building, room_no 
+
+<i>R0</i> can be decomposed into:
+<ul>
+<li> R2(s_ID, course_id, sec_id, semester, year, time_slot_id, grade) </li>
+<li> R3([underline]course_id, sec_id, semester[/underline], building, room_no)</li>
+</ul>
+
+Again, given: course_id, sec_id, semester, year →  time_slot_id 
+
+<i>R2</i> can be decomposed into:
+<ul>
+<li> R4([underline]s_ID, course_id, sec_id, semester, year[/underline], grade) </li>
+<li> R5([underline]course_id, sec_id, semester[/underline], time_slot_id)</li>
+</ul>
+
+Thus one possible decomposition is:
+<ul>
+<li> <b>R1([underline]course_id, sec_id, semester[/underline], i_ID)</b></li>
+<li> <b>R3([underline]course_id, sec_id, semester[/underline], building, room_no)</b></li>
+<li> <b>R4([underline]s_ID, course_id, sec_id, semester, year[/underline], grade) </b></li>
+<li> <b>R5([underline]course_id, sec_id, semester[/underline], time_slot_id)</b></li>
+</ul>
+
+(d) Relations not in BCNF may suffer from data redundancy, which can also be reflected by:
+
+<b>Update anomalies</b>:
+For example, if you want to change instructor for a given course section, you will need to update every records that has that section, because of redundancy. 
+
+<b>Deletion anomalies</b>:
+If we want delete all the student information from a given course section, we will lose all the information associated with that course too, including building, room_no and time_slot_id etc.
+
+<b>Insertion anomalies</b>:
+When a course section needed to be inserted but no student has enrolled yet. In this case, there is no way to insert a record without knowing student ID.
+
+(e) Based on the requirement, the appended FDs are:
+<ul>
+<li> s_ID, course_id, sec_id, semester, year →  grade</li>
+<li> course_id, sec_id, semester, year →  i_ID  (*) </li>
+<li> course_id, sec_id, semester, year →  building, room_no</li>
+<li> course_id, sec_id, semester, year →  time_slot_id</li>
+<li> course_id, s_ID →  i_ID  (*) </li>
+<li> i_ID, s_ID →  course_id</li>
+<li> course_id →  i_ID</li>
+</ul>
+
+Simplify the FDs above (by deleting those marked by star), we get:
+<ul>
+<li><b> s_ID, course_id, sec_id, semester, year →  grade</b></li>
+<li><b> course_id, sec_id, semester, year →  building, room_no</b></li>
+<li><b> course_id, sec_id, semester, year →  time_slot_id</b></li>
+<li><b> i_ID, s_ID →  course_id</b></li>
+<li><b> course_id →  i_ID</b></li>
+</ul>
+
+(f) Two candidate keys: <b>{course_id, sec_id, semester, year, s_ID}</b> and <b>{i_ID, sec_id, semester, year, s_ID}</b>.
+
+(g) Use FD: course_id → i_ID, since course_id is not super key in:
+<i>takesSecTaughtBy</i>(i_ID, s_ID, course_id, sec_id, semester, year, building, room_no, time_slot_id, grade)
+
+We know <i>takesSecTaughtBy</i> is <b>not in BCNF</b>.
+
+Now decompose it, use course_id → i_ID:
+<ul>
+<li> R0([underline]s_ID, course_id, sec_id, semester, year[/underline], building, room_no, time_slot_id, grade)
+ </li>
+<li> R1([underline]course_id[/underline], i_ID)</li>
+</ul>
+
+Similarly, we decompose R0 into:
+<ul>
+<li> R2([underline]course_id, sec_id, semester, year[/underline], time_slot_id)</li>
+<li> R3([underline]course_id, sec_id, semester, year[/underline], building, room_no)</li>
+<li> R4([underline]s_ID, course_id, sec_id, semester, year[/underline], grade)</li>
+</ul>
+
+Yields the decomposition in BCNF:
+<ul>
+<li><b> R1([underline]course_id[/underline], i_ID)</b></li>
+<li><b> R2([underline]course_id, sec_id, semester, year[/underline], time_slot_id)</b></li>
+<li><b> R3([underline]course_id, sec_id, semester, year[/underline], building, room_no)</b></li>
+<li><b> R4([underline]s_ID, course_id, sec_id, semester, year[/underline], grade)</b></li>
+</ul>
+
+
+
+
+
+
+
+<h3>Problem 8</h3>
+(a) It is <b>neither BCNF nor 3NF</b>. Because b is not super key and c is not part of super key (the only candidate key is <i>a</i> in this case).
+
+One good 3NF decomposition would be:
+<ul>
+<li><b>R1([underline]a[/underline], b)</b></li>
+<li><b>R2([underline]b[/underline], c)</b></li>
+</ul>
+It is in BCNF thus in 3NF, it is lossless because [imath]R_1 \cap R_2 = \set{b}[/imath] which is the primary key of R2. And it is dependency preserving because the two FDs are all satisfied apparently.
+
+(b) First the candidate keys are: ab, cb and db. 
+Thus it is <b>not in BCNF</b> since either <i>c</i> or <i>d</i> is not super key. But it is <b>in 3NF</b> because both <i>c</i>, <i>d</i> and <i>a</i> are part of key.
+
+(c) The only candidate key is <i>ab</i> in this case, so R is <b>neither in 3NF nor BCNF</b>. Because b is not a super key and c or d is not part of key.
+
+One good 3NF decomposition would be:
+<ul>
+<li><b>R1([underline]a, b[/underline])</b></li>
+<li><b>R2([underline]b[/underline], c, d)</b></li>
+</ul>
+It is in BCNF thus in 3NF, it is lossless because [imath]R_1 \cap R_2 = \set{b}[/imath] which is the primary key of R2. And it is dependency preserving because the two FDs are all satisfied apparently.
+
+(d) Here candidate keys are: <i>ab</i>, <i>ad</i>, <i>bc</i> and <i>cd</i>. For all these four FDs, their right sides are all candidate keys, therefore the relation is in BCNF thus also in 3NF.
