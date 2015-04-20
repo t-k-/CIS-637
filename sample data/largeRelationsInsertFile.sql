@@ -1,14 +1,3 @@
-delete from prereq;
-delete from time_slot;
-delete from advisor;
-delete from takes;
-delete from student;
-delete from teaches;
-delete from section;
-delete from instructor;
-delete from course;
-delete from department;
-delete from classroom;
 insert into time_slot values ( 'A', 'M', 8, 0, 8, 50);
 insert into time_slot values ( 'A', 'W', 8, 0, 8, 50);
 insert into time_slot values ( 'A', 'F', 8, 0, 8, 50);

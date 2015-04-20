@@ -1,0 +1,38 @@
+	tag:工作篇
+<h2 style="text-align: center">Homework 4</h2>
+<h3>1.</h3>
+For all the solution below, the "size" here is in blocks. And we ignore the CPU process time and only consider disk access time.
+
+(a) We assume binary search is used when searching in the index, and each department offers only one course_id prefix. For example, Computer Science department will only offer courses with course_id starting with "CISC". Then we have:
+
+Actual records size: [imath]\dfrac{4,000 \cdot 256}{4096} = 250[/imath], primary index size: [imath]250 \cdot 10 \% = 25[/imath].
+Time estimation:
+[dmath]
+\newcommand{\sec}{\qquad(\mathrm{sec})}
+\newcommand{\ms}{\qquad(\mathrm{ms})}
+\newcommand{\logt}{\log_2}
+
+\begin{array}{rl}
+\mathrm{i.} & 250 \times 1 = 250 \ms \\
+\mathrm{ii.} & \left(\logt (25) + 1 \right) \times 1 \approx 5.64 \ms \\
+\mathrm{iii.} & \left(\logt (25) + \frac{100 \cdot 256}{4096}\right) \times 1 \approx 4.64+6.25 = 10.89 \ms
+\end{array}
+[/dmath]
+
+(b) We assume binary search is used when searching in the index, and the size of secondary index includes the size of record locations.
+
+Actual records size: [imath]\dfrac{3,500,000 \times 512}{4096} = 437,500 \ms[/imath]
+
+Size of secondary index on ID: [imath]\dfrac{100,000 \times 4 + 100,000 \times 35 \times 8}{4096} \approx 6933.6 [/imath]  
+
+Size of secondary index on (course_id, sec_id, semester, year): [imath]\dfrac{40,000 \times 24 + 3,500,000 \times 8}{4096} \approx 7070.3[/imath]
+
+Time estimation:
+[dmath]
+\begin{array}{rl}
+\mathrm{i.} & 437,500 \times 1 = 437,500 \ms \\
+\mathrm{ii.} & \left(\logt (100,000 \times 4) + 35 \times 8 + 35 \times 512 \right) \times 1 \approx 18,218.6 \ms \\
+\mathrm{iii.} & \left( \logt (40,000 \times 24) + 45 \times 8 + 45 \times 512 \right) \times 1 \approx 23,419.9 \ms \\
+\end{array}
+[/dmath]
+
