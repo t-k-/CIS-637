@@ -1,9 +1,9 @@
 	tag:工作篇
 <h2 style="text-align: center">Homework 4</h2>
-<h3>1.</h3>
+<h3>Problem 1.</h3>
 For all the solution below, the "size" here is in blocks. And we ignore the CPU process time and only consider disk access time.
 
-(a) We assume binary search is used when searching in the index, and each department offers only one course_id prefix. For example, Computer Science department will only offer courses with course_id starting with "CISC". Then we have:
+(a) We assume each department offers only one course_id prefix. For example, Computer Science department will only offer courses with course_id starting with "CISC". Then we have:
 
 Actual records size: [imath]\dfrac{4,000 \cdot 256}{4096} = 250[/imath], primary index size: [imath]250 \cdot 10 \% = 25[/imath].
 Time estimation:
@@ -19,9 +19,8 @@ Time estimation:
 \end{array}
 [/dmath]
 
-(b) We assume binary search is used when searching in the index, and the size of secondary index includes the size of record locations.
-
-Actual records size: [imath]\dfrac{3,500,000 \times 512}{4096} = 437,500 \ms[/imath]
+(b) 
+Actual records size: [imath]\dfrac{3,500,000 \times 512}{4096} = 437,500[/imath]
 
 Size of secondary index on ID: [imath]\dfrac{100,000 \times 4 + 100,000 \times 35 \times 8}{4096} \approx 6933.6 [/imath]  
 
@@ -36,3 +35,61 @@ Time estimation:
 \end{array}
 [/dmath]
 
+<h3>Problem 2.</h3>
+Assume a tree node is stored in one disk block, and a leaf node contains all the locations to associated full records.
+<ul>
+<li>Find records with search-key value 19.
+
+(a) First go to the root node. Then go through the nodes starting with key 19, 23, 19 respectively. Get all the locations associated with search-key value 19, and read the disk records pointed by locations.
+The minimum number of reads needed: [imath]4 + 1 = 5[/imath]
+
+(b) First go to the root node. Then go to the last child of root. Get the locations associated with search-key value 19, and read the disk records pointed by locations.
+The minimum number of reads needed: [imath]2 + 1 = 3[/imath]
+</li>
+
+<li>Find records with search-key values between 5 and 19 (inclusive).
+
+(a) Find the leaf node with search-key value 5 by going through the nodes starting with key 11, 5, 7, 5 respectively. Go through the right leaf-nodes pointed by right pointer until the leaf-node containing 19 is reached. Get all the locations associated with every search-key value in these index records, and read the full records pointed by these locations.
+The minimum number of reads needed: [imath]8 + 5  = 13[/imath]
+
+(b) Find the leaf node with search-key value 5 by going from root to the second child. Go through the right leaf-nodes pointed by right pointer until the leaf-node within which 19 is contained. Get all the locations associated with every search-key value in these index records, and read the full records pointed by these locations.
+The minimum number of reads needed: [imath]4 + 5 = 9[/imath]
+</li>
+</ul>
+
+<h3>Problem 3.</h3>
+<ul>
+<li>[imath]\sigma_{B=1}(R_1)[/imath]
+
+Because [imath]B[/imath] is not indexed, we need a full table scan on [imath]R_1[/imath] to select the records with [imath]B=1[/imath].
+And value of [imath]B[/imath] in each record is possibly not unique, so the minimum number of block reads is [imath]\dfrac{20,000}{200} = 100[/imath].
+
+</li>
+<li>[imath]\sigma_{C=1}(R_2)[/imath]
+
+Because the primary index on [imath]C[/imath], we can use a B+ tree look up on the search key [imath]C[/imath]. The block reads in the B+ tree index is the same as its height [imath]3[/imath], plus one block read for the unique full record (because [imath]C[/imath] is the primary key for [imath]R_2[/imath]) associated. So we have the minimum reads [imath]3 + 1 = 4[/imath].
+
+</li>
+<li>[imath]\sigma_{D=5}(R_2)[/imath]
+
+Since there is a secondary B+ tree index on [imath]D[/imath], we will use index lookup to reach the index record and locate the actual records with [imath]D=5[/imath] by reading [imath]h_D[/imath] blocks top-down from the tree. We can assume all the locations of the full records with same search-key value are stored in the associated leaf node, then the case when only one record in [imath]R_2[/imath] has [imath]D=5[/imath] will result in the minimum number of block reads: [imath]2 + 1 = 3[/imath].
+
+</li>
+<li>[imath]R_1 \bowtie R_2[/imath] (natural join; use indexed nested-loop join)
+
+First we need to read all the records in [imath]R_1[/imath], then for each of these records, use a primary index lookup to get the record with same value in filed [imath]C[/imath] from table [imath]R_2[/imath]. The minimum number of reads in this case is when no [imath]C[/imath] in [imath]R_2[/imath] has the same value thus no further full record reads are required. So the number of reads for each record in [imath]R_1[/imath] can be only the height of the B+ tree index on [imath]C[/imath] of [imath]R_2[/imath], which is [imath]h_C[/imath].
+So the answer is [imath]\dfrac{20,000}{200} + 20,000 \times h_C = 100 + 20,000 \times 3 = 60,100[/imath].
+
+</li>
+<li>[imath]R_1 \bowtie_{B=E} R_2[/imath] (not a natural join; use block nested-loop join)
+
+First we need to read all the records in [imath]R_1[/imath], then for each of these records, scan [imath]R_2[/imath] block by block every time (due to our memory limit). Then the number (also the minimum number) of block reads are: [imath]\dfrac{20,000}{200} + 20,000 \times \dfrac{45,000}{4,500} = 100 + 20,000 \times 10 = 200,100[/imath].
+
+</li>
+<li>[imath]R_1 \bowtie R_2[/imath] (natural join; use sort-merge join and assume memory for one output block)
+
+In order to use merge join, we need to sort two table in order on disk. Because [imath]C[/imath] is primary key in [imath]R_2[/imath], it is already in sorted order on disk. Thus we need first to sort [imath]R_1[/imath] by [imath]C[/imath]. The minimum number of disk reads is achieved by using external merge sort algorithm in which case the read complexity is [imath]2 \times \dfrac{20,000}{200} \times  \log_2(\dfrac{20,000}{200}) = 2 \times 100 \times 7 = 1,400[/imath]. Then the merge-join is performed, with [imath]\dfrac{20,000}{200} + \dfrac{45,000}{4,500} = 110[/imath] disk reads. Therefore the minimum number of block reads are:
+
+[imath]1,400 + 110 = 1,510[/imath].
+</li>
+</ul>
