@@ -1,11 +1,16 @@
 	tag:工作篇
 <h2 style="text-align: center">Homework 4</h2>
+[imath]
+\newcommand{\l}{\left\lceil}
+\newcommand{\r}{\right\rceil}
+[/imath]
 <h3>Problem 1.</h3>
+
 For all the solution below, the "size" here is in blocks. And we ignore the CPU process time and only consider disk access time.
 
 (a) We assume each department offers only one course_id prefix. For example, Computer Science department will only offer courses with course_id starting with "CISC". Then we have:
 
-Actual records size: [imath]\dfrac{4,000 \cdot 256}{4096} = 250[/imath], primary index size: [imath]250 \cdot 10 \% = 25[/imath].
+Actual records size: [imath]\l \dfrac{4,000 \cdot 256}{4096} \r = 250[/imath], primary index size: [imath]250 \cdot 10 \% = 25[/imath].
 Time estimation:
 [dmath]
 \newcommand{\sec}{\qquad(\mathrm{sec})}
@@ -14,24 +19,24 @@ Time estimation:
 
 \begin{array}{rl}
 \mathrm{i.} & 250 \times 1 = 250 \ms \\
-\mathrm{ii.} & \left(\logt (25) + 1 \right) \times 1 \approx 5.64 \ms \\
-\mathrm{iii.} & \left(\logt (25) + \frac{100 \cdot 256}{4096}\right) \times 1 \approx 4.64+6.25 = 10.89 \ms
+\mathrm{ii.} & \left(\l\logt (25)\r + 1 \right) \times 1 = 6 \ms \\
+\mathrm{iii.} & \left(\l\logt (25)\r + \l \frac{100 \cdot 256}{4096} \r \right) \times 1 = 5+7 = 12 \ms
 \end{array}
 [/dmath]
 
 (b) 
-Actual records size: [imath]\dfrac{3,500,000 \times 512}{4096} = 437,500[/imath]
+Actual records size: [imath]\l \dfrac{3,500,000 \times 512}{4096} \r = 437,500[/imath]
 
-Size of secondary index on ID: [imath]\dfrac{100,000 \times 4 + 100,000 \times 35 \times 8}{4096} \approx 6933.6 [/imath]  
+Size of secondary index on ID: [imath]\l\dfrac{100,000 \times 4}{4096}\r + \l\dfrac{100,000 \times 35 \times 8}{4096}\r = 98 + 6836 = 6934 [/imath].
 
-Size of secondary index on (course_id, sec_id, semester, year): [imath]\dfrac{40,000 \times 24 + 3,500,000 \times 8}{4096} \approx 7070.3[/imath]
+Size of secondary index on (course_id, sec_id, semester, year): [imath]\l\dfrac{40,000 \times 24}{4096}\r + \l\dfrac{100,000 \times 35 \times 8}{4096}\r = 235 + 6836 = 7071[/imath]
 
 Time estimation:
 [dmath]
 \begin{array}{rl}
 \mathrm{i.} & 437,500 \times 1 = 437,500 \ms \\
-\mathrm{ii.} & \left(\logt (100,000 \times 4) + 35 \times 8 + 35 \times 512 \right) \times 1 \approx 18,218.6 \ms \\
-\mathrm{iii.} & \left( \logt (40,000 \times 24) + 45 \times 8 + 45 \times 512 \right) \times 1 \approx 23,419.9 \ms \\
+\mathrm{ii.} & \left(\l\logt (98)\r + \l\frac{35 \times 8}{4096}\r + \l\frac{35 \times 512}{4096}\r \right) \times 1 = 7 + 1 + 5 = 13 \ms \\
+\mathrm{iii.} & \left(\l\logt (235)\r + \l\frac{45 \times 8}{4096}\r + \l\frac{45 \times 512}{4096}\r \right) \times 1 = 8 + 1 + 6 = 15 \ms \\
 \end{array}
 [/dmath]
 
@@ -55,6 +60,15 @@ The minimum number of reads needed: [imath]8 + 5  = 13[/imath]
 (b) Find the leaf node with search-key value 5 by going from root to the second child. Go through the right leaf-nodes pointed by right pointer until the leaf-node within which 19 is contained. Get all the locations associated with every search-key value in these index records, and read the full records pointed by these locations.
 The minimum number of reads needed: [imath]4 + 5 = 9[/imath]
 </li>
+
+<li>Find records with search-key values less than 11.
+
+(a) Locate the first left-most leaf of the tree by going along every left-most child from the root (nodes starting with 11, 5, 3, 2). Go from the left-most child towards the right leaf nodes using the right pointer until the node within which the search-key 11 is stored. Get all the locations associated with every search-key value in these index records except that with search-key value 11, and read the full records pointed by these locations.
+The minimum number of reads needed: [imath]8 + 4  = 12[/imath]
+
+(b) Locate the first left-most leaf of the tree by going to the left-most child from the root. Then go from the left-most child towards the right leaf nodes using the right pointer until the node within which the search-key 11 is stored. Get all the locations associated with every search-key value in these index records except that with search-key value 11, and read the full records pointed by these locations.
+The minimum number of reads needed: [imath]4 + 4  = 8[/imath]
+</li>
 </ul>
 
 <h3>Problem 3.</h3>
@@ -77,8 +91,8 @@ Since there is a secondary B+ tree index on [imath]D[/imath], we will use index 
 </li>
 <li>[imath]R_1 \bowtie R_2[/imath] (natural join; use indexed nested-loop join)
 
-First we need to read all the records in [imath]R_1[/imath], then for each of these records, use a primary index lookup to get the record with same value in filed [imath]C[/imath] from table [imath]R_2[/imath]. The minimum number of reads in this case is when no [imath]C[/imath] in [imath]R_2[/imath] has the same value thus no further full record reads are required. So the number of reads for each record in [imath]R_1[/imath] can be only the height of the B+ tree index on [imath]C[/imath] of [imath]R_2[/imath], which is [imath]h_C[/imath].
-So the answer is [imath]\dfrac{20,000}{200} + 20,000 \times h_C = 100 + 20,000 \times 3 = 60,100[/imath].
+First we need to read all the records in [imath]R_1[/imath], then for each of these records, use a primary index lookup to get the record with same value in filed [imath]C[/imath] from table [imath]R_2[/imath]. Because [imath]C[/imath] in [imath]R_1[/imath] is a foreign key to [imath]C[/imath] in [imath]R_2[/imath], there must exist a record in [imath]R_2[/imath] with the same value, thus we need one further read to get the full record each time. So the number of reads for each record in [imath]R_1[/imath] is the height of the B+ tree index of [imath]R_2[/imath] added one, which is [imath]h_C + 1[/imath].
+So the answer is [imath]\dfrac{20,000}{200} + 20,000 \times (h_C+1) = 100 + 20,000 \times 4 = 80,100[/imath].
 
 </li>
 <li>[imath]R_1 \bowtie_{B=E} R_2[/imath] (not a natural join; use block nested-loop join)
@@ -88,8 +102,18 @@ First we need to read all the records in [imath]R_1[/imath], then for each of th
 </li>
 <li>[imath]R_1 \bowtie R_2[/imath] (natural join; use sort-merge join and assume memory for one output block)
 
-In order to use merge join, we need to sort two table in order on disk. Because [imath]C[/imath] is primary key in [imath]R_2[/imath], it is already in sorted order on disk. Thus we need first to sort [imath]R_1[/imath] by [imath]C[/imath]. The minimum number of disk reads is achieved by using external merge sort algorithm in which case the read complexity is [imath]2 \times \dfrac{20,000}{200} \times  \log_2(\dfrac{20,000}{200}) = 2 \times 100 \times 7 = 1,400[/imath]. Then the merge-join is performed, with [imath]\dfrac{20,000}{200} + \dfrac{45,000}{4,500} = 110[/imath] disk reads. Therefore the minimum number of block reads are:
+In order to use merge join, we need to sort two table in order on disk. Because [imath]C[/imath] is primary key in [imath]R_2[/imath], it is already in sorted order on disk. Thus we need first to sort [imath]R_1[/imath] by [imath]C[/imath]. The minimum number of disk reads is achieved by using external merge sort algorithm in which case the read complexity is [imath]2 \times \dfrac{20,000}{200} \times  
+\l \log_2(\dfrac{20,000}{200})\r = 2 \times 100 \times 7 = 1,400[/imath]. Then the merge-join is performed, with [imath]\dfrac{20,000}{200} + \dfrac{45,000}{4,500} = 110[/imath] disk reads. Therefore the minimum number of block reads are:
 
 [imath]1,400 + 110 = 1,510[/imath].
+</li>
+</ul>
+
+<h3>Problem 4.</h3>
+<ul>
+<li>Access the sequential file directly.
+
+Besides the binary search to locate the record within which [imath]A=50,000[/imath] is stored, (a) and (b) will also involve range search, the block read complexity of (a) and (b) will be greater than or at least equal to that of (c).
+
 </li>
 </ul>
